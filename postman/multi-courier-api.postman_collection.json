@@ -1,0 +1,133 @@
+{
+  "info": {
+    "_postman_id": "c8a41df2-4db1-4c12-9214-e53f317b2b81",
+    "name": "Multi-Courier Integration Platform API",
+    "description": "Production-ready Postman collection for the Multi-Courier Integration Platform with requests covering single orders, bulk orders, tracking, cancellation, and error cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Create Order - MockCourier (Success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORD-TEST-001\",\n  \"courier_partner\": \"mock_courier\",\n  \"shipper\": {\n    \"name\": \"Acme Warehouse\",\n    \"phone\": \"9876543210\",\n    \"email\": \"warehouse@acme.com\",\n    \"address\": \"Plot 42 Sector 18\",\n    \"city\": \"Gurugram\",\n    \"state\": \"Haryana\",\n    \"pincode\": \"122001\",\n    \"country\": \"India\"\n  },\n  \"consignee\": {\n    \"name\": \"John Doe\",\n    \"phone\": \"9123456780\",\n    \"email\": \"john@example.com\",\n    \"address\": \"Flat 304 Green Heights\",\n    \"city\": \"Bengaluru\",\n    \"state\": \"Karnataka\",\n    \"pincode\": \"560001\",\n    \"country\": \"India\"\n  },\n  \"package\": {\n    \"weight_kg\": 0.75,\n    \"dimensions_cm\": { \"length\": 15, \"breadth\": 10, \"height\": 8 },\n    \"item_description\": \"Smart Watch\",\n    \"declared_value\": 2500\n  },\n  \"payment\": {\n    \"type\": \"PREPAID\",\n    \"collectable_amount\": 0\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Order - UrbaneBolt UAT (Success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORD-UB-001\",\n  \"courier_partner\": \"urbanebolt\",\n  \"shipper\": {\n    \"name\": \"Rohit Athaley\",\n    \"phone\": \"9425018023\",\n    \"email\": \"bhopal@mbdgroup.com\",\n    \"address\": \"Plot No. 137, Industrial Area\",\n    \"city\": \"Govindpura\",\n    \"state\": \"Bhopal\",\n    \"pincode\": \"122017\",\n    \"country\": \"India\"\n  },\n  \"consignee\": {\n    \"name\": \"Satyam Convent School\",\n    \"phone\": \"8320226438\",\n    \"email\": \"school@example.com\",\n    \"address\": \"Plot 26-27 Om Nagar\",\n    \"city\": \"Surat\",\n    \"state\": \"Gujarat\",\n    \"pincode\": \"122001\",\n    \"country\": \"India\"\n  },\n  \"package\": {\n    \"weight_kg\": 1.1,\n    \"dimensions_cm\": { \"length\": 12, \"breadth\": 10, \"height\": 10 },\n    \"item_description\": \"Textbooks\",\n    \"declared_value\": 100\n  },\n  \"payment\": {\n    \"type\": \"COD\",\n    \"collectable_amount\": 1\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders"]
+        }
+      }
+    },
+    {
+      "name": "3. Track Order",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/ORD-TEST-001/track",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders", "ORD-TEST-001", "track"]
+        }
+      }
+    },
+    {
+      "name": "4. Cancel Order",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/ORD-TEST-001/cancel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders", "ORD-TEST-001", "cancel"]
+        }
+      }
+    },
+    {
+      "name": "5. Bulk Create Orders (HTTP 202 Accepted)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orders\": [\n    {\n      \"order_id\": \"BULK-001\",\n      \"courier_partner\": \"mock_courier\",\n      \"shipper\": { \"name\": \"Seller A\", \"phone\": \"9876543210\", \"address\": \"A1\", \"city\": \"Delhi\", \"state\": \"Delhi\", \"pincode\": \"110001\", \"country\": \"India\" },\n      \"consignee\": { \"name\": \"Buyer A\", \"phone\": \"9123456780\", \"address\": \"B1\", \"city\": \"Mumbai\", \"state\": \"Maharashtra\", \"pincode\": \"400001\", \"country\": \"India\" },\n      \"package\": { \"weight_kg\": 0.5, \"dimensions_cm\": { \"length\": 10, \"breadth\": 10, \"height\": 8 }, \"item_description\": \"Accessories\", \"declared_value\": 400 },\n      \"payment\": { \"type\": \"PREPAID\", \"collectable_amount\": 0 }\n    },\n    {\n      \"order_id\": \"BULK-002\",\n      \"courier_partner\": \"urbanebolt\",\n      \"shipper\": { \"name\": \"Seller B\", \"phone\": \"9876543210\", \"address\": \"A2\", \"city\": \"Delhi\", \"state\": \"Delhi\", \"pincode\": \"110001\", \"country\": \"India\" },\n      \"consignee\": { \"name\": \"Buyer B\", \"phone\": \"9123456780\", \"address\": \"B2\", \"city\": \"Pune\", \"state\": \"Maharashtra\", \"pincode\": \"411001\", \"country\": \"India\" },\n      \"package\": { \"weight_kg\": 1.0, \"dimensions_cm\": { \"length\": 12, \"breadth\": 12, \"height\": 10 }, \"item_description\": \"Garments\", \"declared_value\": 800 },\n      \"payment\": { \"type\": \"COD\", \"collectable_amount\": 800 }\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/bulk",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders", "bulk"]
+        }
+      }
+    },
+    {
+      "name": "6. Poll Bulk Batch Status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/bulk/{{batchId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders", "bulk", "{{batchId}}"]
+        }
+      }
+    },
+    {
+      "name": "7. Error - Unknown Courier Partner (HTTP 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORD-ERR-001\",\n  \"courier_partner\": \"fedex_express\",\n  \"shipper\": { \"name\": \"Seller\", \"phone\": \"9876543210\", \"address\": \"A1\", \"city\": \"Delhi\", \"state\": \"Delhi\", \"pincode\": \"110001\", \"country\": \"India\" },\n  \"consignee\": { \"name\": \"Buyer\", \"phone\": \"9123456780\", \"address\": \"B1\", \"city\": \"Mumbai\", \"state\": \"Maharashtra\", \"pincode\": \"400001\", \"country\": \"India\" },\n  \"package\": { \"weight_kg\": 0.5, \"dimensions_cm\": { \"length\": 10, \"breadth\": 10, \"height\": 8 }, \"item_description\": \"Item\", \"declared_value\": 100 },\n  \"payment\": { \"type\": \"PREPAID\", \"collectable_amount\": 0 }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders"]
+        }
+      }
+    },
+    {
+      "name": "8. Error - Missing Validation Fields (HTTP 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"order_id\": \"ORD-INVALID\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders"]
+        }
+      }
+    }
+  ]
+}
