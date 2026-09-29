@@ -1,0 +1,94 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ShipmentStatus {
+  CREATED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+  FAILED
+}
+
+enum BatchStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+}
+
+model Order {
+  id                  String           @id @default(uuid())
+  orderId             String           @unique
+  courierPartner      String
+  courierShipmentId   String?
+  awbNumber           String?          @unique
+  status              ShipmentStatus   @default(CREATED)
+  
+  // Normalized consumer payload
+  clientPayload       Json
+  
+  // Third-party audit trail
+  courierRawRequest   Json?
+  courierRawResponse  Json?
+  failureReason       String?
+  
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  trackingHistory     TrackingHistory[]
+
+  @@index([orderId])
+  @@index([awbNumber])
+  @@index([courierPartner, status])
+}
+
+model TrackingHistory {
+  id              String         @id @default(uuid())
+  orderId         String
+  awbNumber       String
+  status          ShipmentStatus
+  statusDetails   String?
+  location        String?
+  rawPayload      Json
+  recordedAt      DateTime       @default(now())
+
+  order           Order          @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([awbNumber])
+}
+
+model BulkBatch {
+  id             String          @id @default(uuid())
+  totalOrders    Int
+  succeededCount Int             @default(0)
+  failedCount    Int             @default(0)
+  status         BatchStatus     @default(PENDING)
+  createdAt      DateTime        @default(now())
+  completedAt    DateTime?
+
+  items          BulkBatchItem[]
+}
+
+model BulkBatchItem {
+  id             String          @id @default(uuid())
+  batchId        String
+  orderId        String
+  courierPartner String
+  status         String          // PENDING, SUCCESS, FAILED
+  awbNumber      String?
+  errorReason    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  batch          BulkBatch       @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+  @@index([orderId])
+}
