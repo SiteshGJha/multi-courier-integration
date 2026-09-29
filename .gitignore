@@ -19,5 +19,5 @@ yarn-error.log*
 .vscode
 .idea
 
-# SDD scratch workspace
-.superpowers
+# Build cache
+*.tsbuildinfo
