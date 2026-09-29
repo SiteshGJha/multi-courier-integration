@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: courier_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: courier_user
+      POSTGRES_PASSWORD: courier_password
+      POSTGRES_DB: courier_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U courier_user -d courier_db']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: courier_app
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://courier_user:courier_password@postgres:5432/courier_db?schema=public
+      URBANEBOLT_BASE_URL: https://uat.urbanebolt.in/api/v1
+      URBANEBOLT_USERNAME: info@urbanebolt.com
+      URBANEBOLT_PASSWORD: EKIcygsLVV5RCtPZ
+      COURIER_MAX_RETRIES: 3
+      COURIER_INITIAL_BACKOFF_MS: 500
+      COURIER_BACKOFF_FACTOR: 2
+      COURIER_TIMEOUT_MS: 10000
+      BULK_CONCURRENCY_LIMIT: 10
+
+volumes:
+  postgres_data:
